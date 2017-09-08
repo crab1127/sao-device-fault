@@ -7,10 +7,10 @@ export const API = {
 
   // 故障列表
   fault: API_ROOT + '/device/handleFault',
-  faultDetail: API_ROOT + '/device/handleFault/type',
+  faultDetail: API_ROOT + '/device/handleFault',
   // 故障描述类目
   faultCategory: API_ROOT + '/device/category',
 
   //  /rwy-service/device/desc/{terminalId}
-  faultDeviceDesc: API_ROOT + '/rwy-service/device/desc'
+  faultDeviceDesc: API_ROOT + '/device/desc'
 }

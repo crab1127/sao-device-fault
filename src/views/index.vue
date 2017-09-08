@@ -7,7 +7,7 @@
     </mt-navbar>
     <mt-tab-container v-model="selected">
       <mt-tab-container-item id="301">
-        <div class="panel" v-for="item in list301" :key="item.terminalID" @click="onNav(item.terminalID)">
+        <div class="panel" v-for="item in list301" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 401)">
           <div class="cell gray">
             <div class="cell-bd">
               {{ item.salesNetworkName }}
@@ -20,7 +20,7 @@
             <p>设备编号：{{ item.salesNetworkID }}</p>
             <p>机器型号：{{ item.printerModel }}</p>
             <p class="red">{{ item.printerStatusDesc }}</p>
-            <span class="fault-status">待处理</span>
+            <span class="red fault-status">待处理</span>
           </div>
           <div class="cell gray">
             <div class="cell-bd">
@@ -34,7 +34,7 @@
       </mt-tab-container-item>
       <mt-tab-container-item id="302">
         <template v-if="list302 && list302.length">
-          <div class="panel" v-for="item in list302" :key="item.terminalID" @click="onNav(item.terminalID)">
+          <div class="panel" v-for="item in list302" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 402)">
             <div class="cell gray">
               <div class="cell-bd">
                 {{ item.salesNetworkName }}
@@ -47,7 +47,7 @@
               <p>设备编号：{{ item.salesNetworkID }}</p>
               <p>机器型号：{{ item.printerModel }}</p>
               <p class="red">{{ item.printerStatusDesc }}</p>
-              <span class="fault-status">待处理</span>
+              <span class="green fault-status">已处理</span>
             </div>
             <div class="cell gray">
               <div class="cell-bd">
@@ -65,7 +65,7 @@
       </mt-tab-container-item>
       <mt-tab-container-item id="303">
         <template v-if="list303 && list303.length">
-          <div class="panel" v-for="item in list303" :key="item.terminalID" @click="onNav(item.terminalID)">
+          <div class="panel" v-for="item in list303" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 403)">
             <div class="cell gray">
               <div class="cell-bd">
                 {{ item.salesNetworkName }}
@@ -78,7 +78,7 @@
               <p>设备编号：{{ item.salesNetworkID }}</p>
               <p>机器型号：{{ item.printerModel }}</p>
               <p class="red">{{ item.printerStatusDesc }}</p>
-              <span class="fault-status">待处理</span>
+              <span class="origin fault-status">求助</span>
             </div>
             <div class="cell gray">
               <div class="cell-bd">
@@ -130,11 +130,11 @@
       onChange(e, a){
         console.log(e)
       },
-      onNav(id) {
+      onNav(id, handID, type) {
         this.$router.push({
           name: 'detail',
           params: {id},
-          query: {type: this.selected}
+          query: {handID, type}
         })
       },
       onOpenLocation(data) {
