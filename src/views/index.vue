@@ -101,6 +101,8 @@
 <script>
   import { fetchFaultList } from '../api'
   import { dateFormat } from '../common'
+  import wxSDK from '../wx'
+
   export default {
     name: 'fault',
     data () {
@@ -118,6 +120,7 @@
     },
 
     mounted () {
+      this.wxSDK = wxSDK()
       this.load(this.selected)
     },
     methods: {

@@ -128,7 +128,7 @@
           <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
         </template>
         <template v-if="type == 403">  
-          <mt-button>已处理</mt-button>
+          <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
         </template>
       </div>
     </template>

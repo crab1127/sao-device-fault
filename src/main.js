@@ -25,7 +25,7 @@ Vue.use(VueResource)
 Vue.config.productionTip = false
 Vue.http.options.emulateJSON = true
 Vue.http.interceptors.push(function(request, next) {
-  let authorize
+  let authorize = {}
   try {
     authorize = JSON.parse(sessionStorage.authorize)
   } catch (e) {}
@@ -47,7 +47,7 @@ Vue.http.interceptors.push(function(request, next) {
   }
   next((response) => {
     if (response.status === '401') {
-      authorize()
+      location.href = loginUrl
     }
   })
 })

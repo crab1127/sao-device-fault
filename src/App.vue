@@ -25,10 +25,15 @@ export default {
   },
   methods: {
     authorize() {
-      authorize()
-        .then(res => {
-          this.bootstrap = true
-        })
+      // try {
+        // const authorize = JSON.parse(ticket)
+        sessionStorage.authorize = ticket
+        this.bootstrap = true
+      // } 
+      // authorize()
+      //   .then(res => {
+      //     this.bootstrap = true
+      //   })
     },
     setSize() {
       this.routeName = this.$route.name
