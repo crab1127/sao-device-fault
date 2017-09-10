@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <mt-navbar v-model="selected" style="border-bottom: 2px solid #ddd;">
-      <mt-tab-item id="301">选项一</mt-tab-item>
-      <mt-tab-item id="302">选项二</mt-tab-item>
-      <mt-tab-item id="303">选项三</mt-tab-item>
+      <mt-tab-item id="301">待处理</mt-tab-item>
+      <mt-tab-item id="302">已处理</mt-tab-item>
+      <mt-tab-item id="303">求助</mt-tab-item>
     </mt-navbar>
     <mt-tab-container v-model="selected">
       <mt-tab-container-item id="301">

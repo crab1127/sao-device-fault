@@ -17,7 +17,8 @@ export default () => new Promise((resolve, reject) => {
       'chooseImage',
       'previewImage',
       'uploadImage',
-      'downloadImage'
+      'downloadImage',
+      'openLocation'
     ]
   })
   wx.ready(function() {

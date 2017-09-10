@@ -280,6 +280,44 @@
           }
         }
         params.recordStatus = status
+
+        if (params.networkType == '101' && !params.wifiNo ){
+          this.$toast({
+            message: '请填写wifi编码',
+            duration: 3000
+          });
+          return 
+        }
+        if (!params.networkType ){
+          this.$toast({
+            message: '请选择网络类型',
+            duration: 3000
+          });
+          return 
+        }
+        if (!params.signalLevel ){
+          this.$toast({
+            message: '请选择网络信号',
+            duration: 3000
+          });
+          return 
+        }
+        if (!params.faultCategoryIDs ){
+          this.$toast({
+            message: '请选择故障类型',
+            duration: 3000
+          });
+          return 
+        }
+
+        if (!params.printerPhoto && !params.devicePhoto && !params.testPhoto ){
+          this.$toast({
+            message: '请上传图片',
+            duration: 3000
+          });
+          return 
+        }
+
         saveFault(params)
           .then(res => {
             if (res.body.status !== 'status') throw new Error()
@@ -312,6 +350,7 @@
         })
       },
       onUpload(name) {
+        const self = this
         this.wxSDK.then(wx => {
           wx.chooseImage({
             count: 1, // 默认9
@@ -319,7 +358,20 @@
             sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
             success: function (res) {
               var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-              console.log(res)
+              if (localIds[0]) {
+                const loading = self.$toast({
+                  message: '上传图片中...',
+                  duration: -1
+                });
+                wx.uploadImage({
+                  localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
+                  isShowProgressTips: 1, // 默认为1，显示进度提示
+                  success: function (res) {
+                    self.info[name] = res.serverId
+                    loading.close()
+                  }
+                })
+              }
             }
           })
         })
