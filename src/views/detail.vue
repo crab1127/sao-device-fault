@@ -41,6 +41,7 @@
           <div class="cell-bd">
             <template v-if="info.networkType ">
               {{ info.networkType | idToName(networkTypeList)}}
+              {{ info.networkType == 101 ? ':' + info.wifiNo : '' }}
             </template>
             <template v-else>
               <span class="gray">请选择网络设备</span>
@@ -243,20 +244,7 @@
         this.info.faultCategoryIDs = ids
         this.faultCategoryName = name
       })
-      fetchfaultCategory()
-        .then(res => {
-          const a = res.body.data
-          const listTemp = []
-          a.forEach((item, i) => {
-            item.childList.forEach(aa => {
-              listTemp.push({
-                value: aa.categoryId,
-                label: aa.categoryName
-              })
-            })
-          })
-          this.categoryList = listTemp
-        })
+      
     },
     activated() {
 
@@ -264,7 +252,6 @@
       const handID = this.$route.query.handID
       this.type = this.$route.query.type
       const self = this
-      console.log(213)
       fetchFaultDeviceDesc({id, handID})
         .then(res => {
           if (res.body.status !== 'success') throw new Error()
@@ -280,7 +267,7 @@
                 this.downImg()
                 this.restore()
                 if (this.info.faultCategoryIDs && !this.faultCategoryName) {
-                  this.faultCategoryName = this.getCategoryName(this.info.faultCategoryIDs)
+                  this.getCategoryName(this.info.faultCategoryIDs)
                 }
                 this.status = 'success'
               })
@@ -363,6 +350,7 @@
             if (res.body.status !== 'success') throw new Error()
             this.$messagebox.alert('操作成功').then(action => {
               console.log(action)
+               this.$router.go(-1)
             })
           })
           .catch(err => {
@@ -439,7 +427,7 @@
             longitude: data.longitude, // 经度，浮点数，范围为180 ~ -180。
             name: data.salesNetworkName, // 位置名
             address: data.detailAddress, // 地址详情说明
-            scale: 25, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            scale: 20, // 地图缩放级别,整形值,范围从1~28。默认为最大
             infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
           });
         })
@@ -447,25 +435,43 @@
 
       getCategoryName(vals) {
         try {
-          if (typeof vals === 'string') {
-            vals = vals.split(',')
-          }
-          const nameList = []
-          vals.forEach(id => {
-            this.categoryList.forEach(item => {
-              if (id == item.value) {
-                nameList.push(item.label)
+          fetchfaultCategory()
+            .then(res => {
+              const a = res.body.data
+              const listTemp = []
+              a.forEach((item, i) => {
+                item.childList.forEach(aa => {
+                  listTemp.push({
+                    value: aa.categoryId,
+                    label: aa.categoryName
+                  })
+                })
+              })
+              this.categoryList = listTemp
+            
+              if (typeof vals === 'string') {
+                vals = vals.split(',')
               }
-            })
+              const nameList = []
+              vals.forEach(id => {
+                this.categoryList.forEach(item => {
+                  if (id == item.value) {
+                    nameList.push(item.label)
+                  }
+                })
+              })
+              this.faultCategoryName = nameList.join(',')
           })
-          return nameList
         } catch(e) {}
       },
       downImg () {
+        const self = this
+
         this.wxSDK.then(wx => {
           this.info.printerPhoto && wx.downloadImage({
             serverId: this.info.printerPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
             success: function (res) {
+              
               self.img.printerPhoto = res.localId // 返回图片下载后的本地ID
             }
           })
@@ -475,10 +481,10 @@
               self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
             }
           })
-          this.info.devicePhoto && wx.downloadImage({
-            serverId: this.info.devicePhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+          this.info.testPhoto && wx.downloadImage({
+            serverId: this.info.testPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
             success: function (res) {
-              self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
+              self.img.testPhoto = res.localId // 返回图片下载后的本地ID
             }
           })
         })
@@ -490,8 +496,8 @@
       restore () {
         const info = sessionStorage.fault_info
         const img = sessionStorage.fault_img
-        sessionStorage.clear('fault_info')
-        sessionStorage.clear('fault_img')
+        sessionStorage.removeItem('fault_info')
+        sessionStorage.removeItem('fault_img')
         if (info) {
           try {
             Object.assign(this.info, JSON.parse(info))

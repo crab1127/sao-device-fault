@@ -39,6 +39,11 @@
             }
           })
         })
+        try {
+          const info = JSON.parse(sessionStorage.fault_info)
+          info.faultCategoryIDs = vals.join(',')
+          sessionStorage.fault_info = JSON.stringify(info)
+        } catch (e) {}
         this.$events.emit('CATEGORY_UPDATE', vals.join(','), nameList.join(','))
       }
     },
