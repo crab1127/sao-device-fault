@@ -34,7 +34,7 @@
         </div>
       </div>
       <div class="cells">
-        <div class="cell cell_access" @click="networkTypeModal = true">
+        <div class="cell" :class="{'cell_access': type != '402'}" @click="onNetworkTypeModalShow">
           <div class="cell-hd">
             网络设备：
           </div>
@@ -48,7 +48,7 @@
           </div>
           <span class="cell-ft"></span>
         </div>
-        <div class="cell cell_access" @click="signalLevelModal = true">
+        <div class="cell" :class="{'cell_access': type != '402'}" @click="onSignalLevelModalShow()">
           <div class="cell-hd">
             网络信号：
           </div>
@@ -65,7 +65,7 @@
       </div>
 
       <div class="cells">
-        <div class="cell cell_access" @click="onNav('category')">
+        <div class="cell" :class="{'cell_access': type != '402'}" @click="onNav('category')">
           <div class="cell-hd">
             故障描述：
           </div>
@@ -76,17 +76,21 @@
           <span class="cell-ft"></span>
         </div>
         <div class="cell">
-          <textarea v-model="info.maintianRecord" placeholder="请输入维修记录"  class="cell-bd" cols="30" rows="6" style="border:0;">
-
-          </textarea>
+          <template v-if="type == 402">
+            {{ info.maintianRecord ? info.maintianRecord : '维修记录' }}
+          </template>
+          <template v-else>  
+            <textarea v-model="info.maintianRecord" placeholder="请输入维修记录"  class="cell-bd" cols="30" rows="6" style="border:0;"></textarea>
+          </template>
+          
         </div>
       </div>
       <div class="panel">
         <div class="panel-hd">上传故障设备照片</div>
         <div class="panel-bd">
           <div class="upload-container column-center" @click="onUpload('printerPhoto')">
-            <template v-if="info.printerPhoto">    
-              <img class="upload_img" :src="info.printerPhoto" alt="">
+            <template v-if="info.printerPhoto && img.printerPhoto">    
+              <img class="upload_img" :src="img.printerPhoto" alt="">
             </template>
             <template v-else>
               <span>+</span>
@@ -94,8 +98,8 @@
             </template>
           </div>
           <div class="upload-container column-center" @click="onUpload('devicePhoto')">
-            <template v-if="info.devicePhoto">    
-              <img class="upload_img" :src="info.devicePhoto" alt="">
+            <template v-if="info.devicePhoto && img.devicePhoto">    
+              <img class="upload_img" :src="img.devicePhoto" alt="">
             </template>
             <template v-else>
               <span>+</span>
@@ -103,8 +107,8 @@
             </template>
           </div>
           <div class="upload-container column-center" @click="onUpload('testPhoto')">
-            <template v-if="info.testPhoto">    
-              <img class="upload_img" :src="info.testPhoto" alt="">
+            <template v-if="info.testPhoto && img.testPhoto">    
+              <img class="upload_img" :src="img.testPhoto" alt="">
             </template>
             <template v-else>
               <span>+</span>
@@ -119,7 +123,12 @@
           <div class="cell-hd">
             超表数：
           </div>
-          <input class="cell-bd" type="text" placeholder="请输入超表数" v-model="info.num"  style="border:0;">
+          <template v-if="type == 402">
+            {{ info.num }}
+          </template>
+          <template v-else>  
+            <input class="cell-bd" type="text" placeholder="请输入超表数" v-model="info.num"  style="border:0;">
+          </template>
         </div>
       </div>
       <div class="btn-container">
@@ -168,7 +177,7 @@
 
 <script>
   import modal from '../components/modal'
-  import { fetchFaultDetail, fetchFaultDeviceDesc, saveFault } from '../api'
+  import { fetchFaultDetail, fetchFaultDeviceDesc, saveFault, fetchfaultCategory } from '../api'
   import { dateFormat } from '../common'
   import wxSDK from '../wx'
 
@@ -192,9 +201,14 @@
           networkType: null, //	网络类型: 101:WIFI蛋,102:中继器, 103:网线	number	@mock=101
           wifiNo:null, //	wifi编号
           num: null, //	超表数	string	
-          printerPhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg', //	打印机图片 media_id	string	
-          devicePhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg',	//设备图片 media_id	string	
-          testPhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg', //	测试成功图片 media_id	string	
+          printerPhoto: '', //	打印机图片 media_id	string	
+          devicePhoto: '',	//设备图片 media_id	string	
+          testPhoto: '', //	测试成功图片 media_id	string	
+        },
+        img: {
+          printerPhoto: '',
+          devicePhoto: '',	
+          testPhoto: '',
         },
         networkTypeList: [
           {
@@ -219,7 +233,8 @@
             value: 202,
             label: '信号差'
           }
-        ]
+        ],
+        categoryList: []
       }
     },
     mounted() {
@@ -228,11 +243,28 @@
         this.info.faultCategoryIDs = ids
         this.faultCategoryName = name
       })
+      fetchfaultCategory()
+        .then(res => {
+          const a = res.body.data
+          const listTemp = []
+          a.forEach((item, i) => {
+            item.childList.forEach(aa => {
+              listTemp.push({
+                value: aa.categoryId,
+                label: aa.categoryName
+              })
+            })
+          })
+          this.categoryList = listTemp
+        })
     },
     activated() {
+
       const id = this.id = this.$route.params.id
       const handID = this.$route.query.handID
       this.type = this.$route.query.type
+      const self = this
+      console.log(213)
       fetchFaultDeviceDesc({id, handID})
         .then(res => {
           if (res.body.status !== 'success') throw new Error()
@@ -240,19 +272,27 @@
           this.info.handID = res.body.data.handID
 
           this.status = 'success'
-          if (this.type) {
+          if (this.type != '401') {
             fetchFaultDetail({type:this.type, id: this.info.handID})
-             .then(res=> {
+              .then(res=> {
                 if (res.body.status !== 'success') throw new Error()
                 Object.assign(this.info, res.body.data)
+                this.downImg()
+                this.restore()
+                if (this.info.faultCategoryIDs && !this.faultCategoryName) {
+                  this.faultCategoryName = this.getCategoryName(this.info.faultCategoryIDs)
+                }
                 this.status = 'success'
               })
-          } 
+          } else {
+            this.restore()
+          }
         })
         .catch(err => {
           console.log(err)
           this.status = 'error'
         })
+      
     },
     deactivated() {
       this.info = {
@@ -264,9 +304,9 @@
         networkType: null, //	网络类型: 101:WIFI蛋,102:中继器, 103:网线	number	@mock=101
         wifiNo:null, //	wifi编号
         num: null, //	超表数	string	
-        printerPhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg', //	打印机图片 media_id	string	
-        devicePhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg',	//设备图片 media_id	string	
-        testPhoto: 'http://img1.gamersky.com/image2017/09/20170906_ls_141_2/gamersky_006small_012_2017961814FF9.jpg', //	测试成功图片 media_id	string	
+        printerPhoto: '', //	打印机图片 media_id	string	
+        devicePhoto: '',	//设备图片 media_id	string	
+        testPhoto: '', //	测试成功图片 media_id	string	
       }
     },
     methods: {
@@ -310,7 +350,7 @@
           return 
         }
 
-        if (!params.printerPhoto && !params.devicePhoto && !params.testPhoto ){
+        if (!params.printerPhoto || !params.devicePhoto || !params.testPhoto ){
           this.$toast({
             message: '请上传图片',
             duration: 3000
@@ -320,7 +360,7 @@
 
         saveFault(params)
           .then(res => {
-            if (res.body.status !== 'status') throw new Error()
+            if (res.body.status !== 'success') throw new Error()
             this.$messagebox.alert('操作成功').then(action => {
               console.log(action)
             })
@@ -329,19 +369,33 @@
             this.$messagebox.alert('提交失败，请重试')
           })
       },
+
+      onNetworkTypeModalShow() {
+        if (this.type === '402') return false;
+        this.networkTypeModal = true
+      },
       onNetworkType() {
         this.networkTypeModal = false
       },
       onNetworkTypeChange(val){
         this.info.networkType = val
       },
+
+      onSignalLevelModalShow() {
+        if (this.type === '402') return false;
+        this.signalLevelModal = true
+      },
       onSignalLevel() {
+        if (this.type === '402') return false;
         this.signalLevelModal = false
       },
       onSignalLevelChange(val){
         this.info.signalLevel = val
       },
+
       onNav() {
+        if (this.type === '402') return false;
+        this.cacheStore()
         this.$router.push({
           name: 'category',
           query: {
@@ -350,6 +404,7 @@
         })
       },
       onUpload(name) {
+        if (this.type === '402') return false;
         const self = this
         this.wxSDK.then(wx => {
           wx.chooseImage({
@@ -366,8 +421,9 @@
                 wx.uploadImage({
                   localId: localIds[0], // 需要上传的图片的本地ID，由chooseImage接口获得
                   isShowProgressTips: 1, // 默认为1，显示进度提示
-                  success: function (res) {
-                    self.info[name] = res.serverId
+                  success: function (res1) {
+                    self.info[name] = res1.serverId
+                    self.img[name] = localIds[0]
                     loading.close()
                   }
                 })
@@ -383,10 +439,71 @@
             longitude: data.longitude, // 经度，浮点数，范围为180 ~ -180。
             name: data.salesNetworkName, // 位置名
             address: data.detailAddress, // 地址详情说明
-            scale: 1, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            scale: 25, // 地图缩放级别,整形值,范围从1~28。默认为最大
             infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
           });
         })
+      },
+
+      getCategoryName(vals) {
+        try {
+          if (typeof vals === 'string') {
+            vals = vals.split(',')
+          }
+          const nameList = []
+          vals.forEach(id => {
+            this.categoryList.forEach(item => {
+              if (id == item.value) {
+                nameList.push(item.label)
+              }
+            })
+          })
+          return nameList
+        } catch(e) {}
+      },
+      downImg () {
+        this.wxSDK.then(wx => {
+          this.info.printerPhoto && wx.downloadImage({
+            serverId: this.info.printerPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+            success: function (res) {
+              self.img.printerPhoto = res.localId // 返回图片下载后的本地ID
+            }
+          })
+          this.info.devicePhoto && wx.downloadImage({
+            serverId: this.info.devicePhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+            success: function (res) {
+              self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
+            }
+          })
+          this.info.devicePhoto && wx.downloadImage({
+            serverId: this.info.devicePhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+            success: function (res) {
+              self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
+            }
+          })
+        })
+      },
+      cacheStore() {
+        sessionStorage.fault_info = JSON.stringify(this.info)
+        sessionStorage.fault_img = JSON.stringify(this.img)
+      },
+      restore () {
+        const info = sessionStorage.fault_info
+        const img = sessionStorage.fault_img
+        sessionStorage.clear('fault_info')
+        sessionStorage.clear('fault_img')
+        if (info) {
+          try {
+            Object.assign(this.info, JSON.parse(info))
+          } catch (e) {
+            console.log(32323242)
+          }
+        }
+        if (img) {
+          try {
+            Object.assign(this.img, JSON.parse(img))
+          } catch (e) {}
+        }
       }
     },
     components: {

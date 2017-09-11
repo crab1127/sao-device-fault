@@ -7,7 +7,7 @@
     </mt-navbar>
     <mt-tab-container v-model="selected">
       <mt-tab-container-item id="301">
-        <div class="panel" v-for="item in list301" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 401)">
+        <div class="panel" v-for="item in list301" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 401, item)">
           <div class="cell gray">
             <div class="cell-bd">
               {{ item.salesNetworkName }}
@@ -34,7 +34,7 @@
       </mt-tab-container-item>
       <mt-tab-container-item id="302">
         <template v-if="list302 && list302.length">
-          <div class="panel" v-for="item in list302" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 402)">
+          <div class="panel" v-for="item in list302" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 402, item)">
             <div class="cell gray">
               <div class="cell-bd">
                 {{ item.salesNetworkName }}
@@ -65,7 +65,7 @@
       </mt-tab-container-item>
       <mt-tab-container-item id="303">
         <template v-if="list303 && list303.length">
-          <div class="panel" v-for="item in list303" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 403)">
+          <div class="panel" v-for="item in list303" :key="item.terminalID" @click="onNav(item.terminalID, item.handID, 403, item)">
             <div class="cell gray">
               <div class="cell-bd">
                 {{ item.salesNetworkName }}
@@ -133,7 +133,10 @@
       onChange(e, a){
         console.log(e)
       },
-      onNav(id, handID, type) {
+      onNav(id, handID, type, item) {
+        if (item.updateUser == 1) {
+          return this.$messagebox.alert('故障为：终端失联故障')
+        }
         this.$router.push({
           name: 'detail',
           params: {id},
@@ -147,7 +150,7 @@
             longitude: data.longitude, // 经度，浮点数，范围为180 ~ -180。
             name: data.salesNetworkName, // 位置名
             address: data.detailAddress, // 地址详情说明
-            scale: 1, // 地图缩放级别,整形值,范围从1~28。默认为最大
+            scale: 25, // 地图缩放级别,整形值,范围从1~28。默认为最大
             infoUrl: '' // 在查看位置界面底部显示的超链接,可点击跳转
           });
         })
