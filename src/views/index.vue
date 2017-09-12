@@ -17,9 +17,9 @@
             </div>
           </div>
           <div class="media">
-            <p>设备编号：{{ item.salesNetworkID }}</p>
+            <p>设备编号：{{ item.teriminalID }}</p>
             <p>机器型号：{{ item.printerModel }}</p>
-            <p class="red">{{ item.printerStatusDesc }}</p>
+            <p class="red">{{ item.printerStatusDesc }} {{ item.teriminalStatus == 601 ? '终端失联' : '' }}</p>
             <span class="red fault-status">待处理</span>
           </div>
           <div class="cell gray">
@@ -44,9 +44,9 @@
               </div>
             </div>
             <div class="media">
-              <p>设备编号：{{ item.salesNetworkID }}</p>
+              <p>设备编号：{{ item.teriminalID }}</p>
               <p>机器型号：{{ item.printerModel }}</p>
-              <p class="red">{{ item.printerStatusDesc }}</p>
+              <p class="red">{{ item.printerStatusDesc }}{{ item.teriminalStatus == 601 ? '终端失联' : '' }}</p>
               <span class="green fault-status">已处理</span>
             </div>
             <div class="cell gray">
@@ -75,9 +75,9 @@
               </div>
             </div>
             <div class="media">
-              <p>设备编号：{{ item.salesNetworkID }}</p>
+              <p>设备编号：{{ item.teriminalID }}</p>
               <p>机器型号：{{ item.printerModel }}</p>
-              <p class="red">{{ item.printerStatusDesc }}</p>
+              <p class="red">{{ item.printerStatusDesc }}{{ item.teriminalStatus == 601 ? '终端失联' : '' }}</p>
               <span class="origin fault-status">求助</span>
             </div>
             <div class="cell gray">
@@ -134,9 +134,9 @@
         console.log(e)
       },
       onNav(id, handID, type, item) {
-        if (item.updateUser == 1) {
-          return this.$messagebox.alert('故障为：终端失联故障')
-        }
+        // if (item.updateUser == 1) {
+        //   return this.$messagebox.alert('故障为：终端失联故障')
+        // }
         this.$router.push({
           name: 'detail',
           params: {id},

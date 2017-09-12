@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="media">
-          <p>设备编号：{{ deviceDesc.salesNetworkID }}</p>
+          <p>设备编号：{{ deviceDesc.teriminalID }}</p>
           <p>机器型号：{{ deviceDesc.printerModel }}</p>
           <p class="red">{{ deviceDesc.printerStatusDesc }}</p>
           <span v-if="type == 401" class="red fault-status">待处理</span>
