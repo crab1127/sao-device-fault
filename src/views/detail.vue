@@ -470,28 +470,30 @@
       },
       downImg () {
         const self = this
-
-        this.wxSDK.then(wx => {
-          this.info.printerPhoto && wx.downloadImage({
-            serverId: this.info.printerPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
-            success: function (res) {
+        this.img.printerPhoto = this.info.printerPhoto
+        this.img.devicePhoto = this.info.devicePhoto
+        this.img.testPhoto = this.info.testPhoto
+        // this.wxSDK.then(wx => {
+        //   this.info.printerPhoto && wx.downloadImage({
+        //     serverId: this.info.printerPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+        //     success: function (res) {
               
-              self.img.printerPhoto = res.localId // 返回图片下载后的本地ID
-            }
-          })
-          this.info.devicePhoto && wx.downloadImage({
-            serverId: this.info.devicePhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
-            success: function (res) {
-              self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
-            }
-          })
-          this.info.testPhoto && wx.downloadImage({
-            serverId: this.info.testPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
-            success: function (res) {
-              self.img.testPhoto = res.localId // 返回图片下载后的本地ID
-            }
-          })
-        })
+        //       self.img.printerPhoto = res.localId // 返回图片下载后的本地ID
+        //     }
+        //   })
+        //   this.info.devicePhoto && wx.downloadImage({
+        //     serverId: this.info.devicePhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+        //     success: function (res) {
+        //       self.img.devicePhoto = res.localId // 返回图片下载后的本地ID
+        //     }
+        //   })
+        //   this.info.testPhoto && wx.downloadImage({
+        //     serverId: this.info.testPhoto, // 需要下载的图片的服务器端ID，由uploadImage接口获得
+        //     success: function (res) {
+        //       self.img.testPhoto = res.localId // 返回图片下载后的本地ID
+        //     }
+        //   })
+        // })
       },
       cacheStore() {
         sessionStorage.fault_info = JSON.stringify(this.info)
