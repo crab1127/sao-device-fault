@@ -6,8 +6,8 @@
 }
 
 body {
-  font-size: 15px;
-  background: #f4f4f4;
+  font-size: 16px;
+  background: #e6e6e6;
 }
 
 .red {
@@ -279,7 +279,7 @@ img {
   margin-top: 10px;
   background-color: #FFFFFF;
   line-height: 1.2;
-  font-size: 17px
+  /* font-size: 17px */
 }
 
 .cells:before {
@@ -483,8 +483,8 @@ img {
 
 .panel-hd {
   padding: 14px 15px 10px;
-  color: #999;
-  font-size: 13px;
+  /* color: #999;
+  font-size: 13px; */
   position: relative
 }
 
