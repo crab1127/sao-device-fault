@@ -138,7 +138,7 @@
       </div>
       <div class="btn-container">
         <template v-if="type == 401">  
-          <mt-button type="danger" @click="onSubmit(403)">求助</mt-button>
+          <mt-button type="danger" v-if="deviceDesc.updateUser == 1" @click="onSubmit(403)">求助</mt-button>
           <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
         </template>
         <template v-if="type == 403">  
