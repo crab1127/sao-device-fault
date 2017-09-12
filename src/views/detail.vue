@@ -299,6 +299,11 @@
         devicePhoto: '',	//设备图片 media_id	string	
         testPhoto: '', //	测试成功图片 media_id	string	
       }
+      this.img= {
+        printerPhoto: '',
+        devicePhoto: '',	
+        testPhoto: ''
+      }
     },
     methods: {
       onSubmit(status) {
