@@ -353,16 +353,21 @@
           });
           return 
         }
-
+        const loading = self.$toast({
+          message: '提交中...',
+          duration: -1
+        });
         saveFault(params)
           .then(res => {
             if (res.body.status !== 'success') throw new Error()
             this.$messagebox.alert('操作成功').then(action => {
               console.log(action)
-               this.$router.go(-1)
+              loading.close()
+              this.$router.go(-1)
             })
           })
           .catch(err => {
+            loading.close()
             this.$messagebox.alert('提交失败，请重试')
           })
       },
