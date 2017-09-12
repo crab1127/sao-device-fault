@@ -17,16 +17,16 @@
           </div>
         </div>
         <div class="media">
-          <p>设备编号：{{ deviceDesc.teriminalID }}</p>
+          <p>设备编号：{{ deviceDesc.terminalID }}</p>
           <p>机器型号：{{ deviceDesc.printerModel }}</p>
-          <p class="red">{{ deviceDesc.printerStatusDesc }}</p>
+          <p class="red">{{ deviceDesc.printerStatusDesc }} {{ item.terminalStatus == 601 ? '终端失联' : '' }}</p>
           <span v-if="type == 401" class="red fault-status">待处理</span>
           <span v-if="type == 402" class="green fault-status">已处理</span>
           <span v-if="type == 403" class="origin fault-status">求助</span>
         </div>
         <div class="cell gray">
           <div class="cell-bd">
-            {{ deviceDesc.detailAddress }}
+            {{ deviceDesc.detailAddress }} 
           </div>
           <div class="cell-ft scoped-to" @click.stop="onOpenLocation(deviceDesc)">
             <img src="../assets/nav.png" width="20px" height="20px" alt="">
