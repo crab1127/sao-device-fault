@@ -138,7 +138,7 @@
       </div>
       <div class="btn-container">
         <template v-if="type == 401">  
-          <mt-button type="danger" v-if="deviceDesc.updateUser == 1" @click="onSubmit(403)">求助</mt-button>
+          <mt-button type="danger" v-if="deviceDesc.updateUser != 1" @click="onSubmit(403)">求助</mt-button>
           <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
         </template>
         <template v-if="type == 403">  
@@ -373,7 +373,7 @@
       },
 
       onNetworkTypeModalShow() {
-        if (this.type === '402') return false;
+        if (this.type == '402') return false;
         this.networkTypeModal = true
       },
       onNetworkType() {
@@ -384,11 +384,11 @@
       },
 
       onSignalLevelModalShow() {
-        if (this.type === '402') return false;
+        if (this.type == '402') return false;
         this.signalLevelModal = true
       },
       onSignalLevel() {
-        if (this.type === '402') return false;
+        if (this.type == '402') return false;
         this.signalLevelModal = false
       },
       onSignalLevelChange(val){
@@ -396,7 +396,7 @@
       },
 
       onNav() {
-        if (this.type === '402') return false;
+        if (this.type == '402') return false;
         this.cacheStore()
         this.$router.push({
           name: 'category',
@@ -406,7 +406,7 @@
         })
       },
       onUpload(name) {
-        if (this.type === '402') return false;
+        if (this.type == '402') return false;
         const self = this
         this.wxSDK.then(wx => {
           wx.chooseImage({
