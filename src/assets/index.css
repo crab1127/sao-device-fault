@@ -358,7 +358,7 @@ img {
   bottom: 0;
   right: 0;
   height: 1px;
-  border-bottom: 1px solid #e6e6e6;
+  border-bottom: 2px solid #e6e6e6;
   color: #e6e6e6
 }
 
@@ -411,7 +411,7 @@ img {
   top: 0;
   right: 0;
   height: 1px;
-  border-top: 1px solid #e8e8e8;
+  border-top: 2px solid #e8e8e8;
   color: #e8e8e8
 }
 

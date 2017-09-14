@@ -46,7 +46,7 @@ Vue.http.interceptors.push(function(request, next) {
     }
   }
   next((response) => {
-    if (response.status === '401') {
+    if (response.status == '401') {
       location.href = loginUrl
     }
   })

@@ -21,7 +21,8 @@
           <p>机器型号：{{ deviceDesc.printerModel }}</p>
           <p class="red">{{ deviceDesc.printerStatusDesc }} {{ deviceDesc.terminalStatus == 601 ? '终端失联' : '' }}</p>
           <span v-if="type == 401" class="red fault-status">待处理</span>
-          <span v-if="type == 402" class="green fault-status">已处理</span>
+          <span v-if="type == 402 && deviceDesc.updateUser != 1" class="green fault-status">已处理</span>
+          <span v-if="type == 402 && deviceDesc.updateUser == 1 " class="green fault-status">系统处理</span>
           <span v-if="type == 403" class="origin fault-status">求助</span>
         </div>
         <div class="cell">
@@ -39,11 +40,11 @@
             网络设备：
           </div>
           <div class="cell-bd">
-            <template v-if="info.networkType ">
+            <template v-if="info.networkType">
               {{ info.networkType | idToName(networkTypeList)}}
               {{ info.networkType == 101 ? ':' + info.wifiNo : '' }}
             </template>
-            <template v-else>
+            <template v-if="!info.networkType">
               <span class="gray">请选择网络设备</span>
             </template>
           </div>
@@ -57,7 +58,7 @@
             <template v-if="info.signalLevel ">
               {{ info.signalLevel | idToName(signalLevelList) }}
             </template>
-            <template v-else>
+            <template v-if="!info.signalLevel ">
               <span class="gray">请选择网络信号</span>
             </template>
           </div>
@@ -71,10 +72,10 @@
             故障描述：
           </div>
           <div class="cell-bd">
-            <template v-if="info.faultCategoryIDs ">
+            <template v-if="info.faultCategoryIDs">
               {{ faultCategoryName }}
             </template>
-            <template v-else>
+            <template v-if="!info.faultCategoryIDs">
               <span class="gray">请选择故障描述</span>
             </template>
           </div>
@@ -84,7 +85,7 @@
           <template v-if="type == 402">
             {{ info.maintianRecord ? info.maintianRecord : '维修记录' }}
           </template>
-          <template v-else>  
+          <template v-if="type != 402">  
             <textarea v-model="info.maintianRecord" placeholder="请输入维修记录"  class="cell-bd" cols="30" rows="6" style="border:0;"></textarea>
           </template>
           
@@ -137,8 +138,11 @@
         </div>
       </div>
       <div class="btn-container">
-        <template v-if="type == 401">  
-          <mt-button type="danger" v-if="deviceDesc.updateUser != 1" @click="onSubmit(403)">求助</mt-button>
+        <template v-if="origin == 402 && deviceDesc.updateUser == 1">  
+          <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
+        </template>
+        <template v-if="origin == 401">  
+          <mt-button type="danger" @click="onSubmit(403)">求助</mt-button>
           <mt-button type="primary" @click="onSubmit(402)">上报处理</mt-button>
         </template>
         <template v-if="type == 403">  
@@ -255,6 +259,7 @@
       const id = this.id = this.$route.params.id
       const handID = this.$route.query.handID
       this.type = this.$route.query.type
+      this.origin = this.$route.query.origin
       const self = this
       fetchFaultDeviceDesc({id, handID})
         .then(res => {
@@ -353,6 +358,14 @@
           });
           return 
         }
+
+        if (!params.num) {
+          this.$toast({
+            message: '请填写超表数',
+            duration: 3000
+          });
+          return 
+        }
         const loading = self.$toast({
           message: '提交中...',
           duration: -1
@@ -406,8 +419,20 @@
         })
       },
       onUpload(name) {
-        if (this.type == '402') return false;
+
         const self = this
+
+        if (this.type == '402') {
+          if (self.info[name]) {
+            this.wxSDK.then(wx => {
+              wx.previewImage({
+                current: self.info[name]
+              })
+            })
+          }
+          return false;
+        }
+       
         this.wxSDK.then(wx => {
           wx.chooseImage({
             count: 1, // 默认9
@@ -555,8 +580,8 @@
     padding: 10px;
     position: relative;
     line-height: 1.8;
-    border-top:1px solid #ddd;
-    border-bottom:1px solid #ddd;
+    /* border-top:1px solid #ddd;
+    border-bottom:1px solid #ddd; */
   }
   .fault-status {
     position: absolute;

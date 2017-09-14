@@ -47,7 +47,12 @@
               <p>设备编号：{{ item.terminalID }}</p>
               <p>机器型号：{{ item.printerModel }}</p>
               <p class="red">{{ item.printerStatusDesc }}{{ item.terminalStatus == 601 ? '终端失联' : '' }}</p>
-              <span class="green fault-status">已处理</span>
+              <template v-if="item.updateUser == 1">
+                <span class="green fault-status">系统处理</span>
+              </template> 
+              <template v-else> 
+                <span class="green fault-status">已处理</span>
+              </template> 
             </div>
             <div class="cell">
               <div class="cell-bd">
@@ -134,13 +139,14 @@
         console.log(e)
       },
       onNav(id, handID, type, item) {
+        let origin = type
         if (type == '402' && item.updateUser == 1) {
           type = 401
         }
         this.$router.push({
           name: 'detail',
           params: {id},
-          query: {handID, type}
+          query: {handID, type, origin}
         })
       },
       onOpenLocation(data) {
@@ -174,8 +180,8 @@
     padding: 10px;
     position: relative;
     line-height: 1.8;
-    border-top:1px solid #ddd;
-    border-bottom:1px solid #ddd;
+    /* border-top:1px solid #ddd;
+    border-bottom:1px solid #ddd; */
   }
   .fault-status {
     position: absolute;
